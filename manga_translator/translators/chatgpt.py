@@ -352,7 +352,7 @@ class HaikuTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
+        # print(response.choices[0].message.content)
         return response.choices[0].message.content
     
 # https://api.perplexity.ai的mixtral-8x7b-instruct，兼容openai格式
@@ -387,7 +387,7 @@ class Mix8x7bTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
+        # print(response.choices[0].message.content)
         return response.choices[0].message.content
     
 # https://api.perplexity.ai的sonar-medium-online，兼容openai格式
@@ -422,7 +422,7 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
+        # print(response.choices[0].message.content)
         return response.choices[0].message.content
     
 # https://api.perplexity.ai的sonar-medium-chat，兼容openai格式
@@ -457,7 +457,7 @@ class SonarMediumChatTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
+        # print(response.choices[0].message.content)
         return response.choices[0].message.content
 
 # https://kimi.geekcoder.shop，兼容openai格式
@@ -492,7 +492,7 @@ class KimiTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
+        # print(response.choices[0].message.content)
         return response.choices[0].message.content
 
 # https://qwen.geekcoder.shop，兼容openai格式
@@ -527,7 +527,7 @@ class QwenTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
+        # print(response.choices[0].message.content)
         return response.choices[0].message.content
 
 # https://glm.geekcoder.shop，兼容openai格式
@@ -562,5 +562,5 @@ class GlmTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
+        # print(response.choices[0].message.content)
         return response.choices[0].message.content
