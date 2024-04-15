@@ -188,6 +188,7 @@ class MangaTranslator():
             return True
 
         logger.info(f'Translating: "{path}"')
+        print(f'Translating: "{path}"')
 
         # Turn dict to context to make values also accessible through params.<property>
         params = params or {}
