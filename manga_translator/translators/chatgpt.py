@@ -405,6 +405,7 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
             messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
             messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
 
+        print("messages: " + messages)
         response = await openai.ChatCompletion.acreate(
             model='sonar-medium-online',
             messages=messages,
@@ -420,5 +421,5 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        print(response)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
