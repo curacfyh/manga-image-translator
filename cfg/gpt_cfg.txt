@@ -8,7 +8,7 @@ top_p: 1
 
 chat_system_template: >
   You are a professional translation engine, 
-  please translate the story into a colloquial, 
+  please translate the Japanese story into a colloquial, 
   elegant and fluent content, 
   without referencing machine translations. 
   You must only translate the story, never interpret it.
@@ -16,8 +16,7 @@ chat_system_template: >
   please output it as is to keep the original intent.
   If there is any issue in the text, output it as is.
   Do not explain, just need to translate.
-
-  Translate to {to_lang}.
+  Translate to Chinese.
 
 chat_sample:
   Simplified Chinese:
