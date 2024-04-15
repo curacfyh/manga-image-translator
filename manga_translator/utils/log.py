@@ -1,5 +1,6 @@
 import logging
 import colorama
+import sys
 
 from .generic import replace_prefix
 
@@ -29,10 +30,12 @@ class Filter(logging.Filter):
 root = logging.getLogger(ROOT_TAG)
 
 def init_logging():
-    logging.basicConfig(level=logging.INFO)
-    for h in logging.root.handlers:
-        h.setFormatter(Formatter())
-        h.addFilter(Filter())
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: [%(name)s] %(message)s', 
+                        handlers=[logging.StreamHandler(sys.stdout)])
+    # logging.basicConfig(level=logging.INFO)
+    # for h in logging.root.handlers:
+    #     h.setFormatter(Formatter())
+    #     h.addFilter(Filter())
 
 def set_log_level(level):
     root.setLevel(level)
