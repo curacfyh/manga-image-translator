@@ -352,6 +352,7 @@ class HaikuTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
     
 # https://api.perplexity.ai的mixtral-8x7b-instruct，兼容openai格式
@@ -386,6 +387,7 @@ class Mix8x7bTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
     
 # https://api.perplexity.ai的sonar-medium-online，兼容openai格式
