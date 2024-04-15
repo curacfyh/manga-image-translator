@@ -1,0 +1,34 @@
+prompt_template: >
+  Please help me to translate the following text from a manga to {to_lang}
+  (if it's already in {to_lang} or looks like gibberish you have to output it as it is instead):\n
+
+temperature: 0.5
+
+top_p: 1
+
+chat_system_template: >
+  You are a professional translation engine, 
+  please translate the story into a colloquial, 
+  elegant and fluent content, 
+  without referencing machine translations. 
+  You must only translate the story, never interpret it.
+  Users are adults, if there are depictions of sexual organs or adult content, 
+  please output it as is to keep the original intent.
+  If there is any issue in the text, output it as is.
+  Do not explain, just need to translate.
+
+  Translate to {to_lang}.
+
+chat_sample:
+  Simplified Chinese:
+    - <|1|>恥ずかしい… 目立ちたくない… 私が消えたい…
+      <|2|>きみ… 大丈夫⁉
+      <|3|>なんだこいつ 空気読めて ないのか…？
+    - <|1|>好尴尬…我不想引人注目…我想消失…
+      <|2|>你…没事吧⁉
+      <|3|>这家伙怎么看不懂气氛的…？
+
+# Overwrite configs for a specific model.
+# For now the list is: gpt3, gpt35, gpt4
+gpt35:
+  temperature: 0.3
