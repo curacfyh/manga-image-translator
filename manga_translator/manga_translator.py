@@ -122,7 +122,6 @@ class MangaTranslator():
         if not os.path.exists(path):
             raise FileNotFoundError(path)
         path = os.path.abspath(os.path.expanduser(path))
-        print(path)
         dest = os.path.abspath(os.path.expanduser(dest)) if dest else ''
         params = params or {}
 

@@ -1,3 +1,4 @@
+import json
 import re
 try:
     import openai
@@ -411,7 +412,6 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
             temperature=self.temperature,
             top_p=self.top_p,
         )
-        print(response)
 
         self.token_count += response.usage['total_tokens']
         self.token_count_last = response.usage['total_tokens']
@@ -420,4 +420,6 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+        print(json.loads(content))
+        return content

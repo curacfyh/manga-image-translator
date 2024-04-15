@@ -39,6 +39,7 @@ async def dispatch(args: Namespace):
         else: # batch
             dest = args.dest
             for path in natural_sort(args.input):
+                print("图片路径：" + path)
                 await translator.translate_path(path, dest, args_dict)
 
     elif args.mode == 'web':
