@@ -420,6 +420,5 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        content = response.choices[0].message.content
-        print(json.loads(content))
-        return content
+        print(response)
+        return response.choices[0].message.content
