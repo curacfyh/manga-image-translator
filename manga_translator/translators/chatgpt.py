@@ -424,7 +424,7 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
         return response.choices[0].message.content
     
 # https://api.perplexity.ai的sonar-medium-chat，兼容openai格式
-class SonarMediumOnlineTranslator(GPT35TurboTranslator):
+class SonarMediumChatTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'sonar-medium-chat'
     _MAX_REQUESTS_PER_MINUTE = 200
     _RETRY_ATTEMPTS = 5
