@@ -411,6 +411,7 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
             temperature=self.temperature,
             top_p=self.top_p,
         )
+        print(response)
 
         self.token_count += response.usage['total_tokens']
         self.token_count_last = response.usage['total_tokens']
