@@ -547,6 +547,14 @@ class QwenPlusTranslator(GPT35TurboTranslator):
             messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
             messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
 
+        print(f"message: {messages}")
+        # 获取openai模块的属性字典
+        attributes = openai.__dict__
+
+        # 遍历属性字典并打印属性名称和值
+        for attr_name, attr_value in attributes.items():
+            print(f"{attr_name}: {attr_value}")
+            
         response = await openai.ChatCompletion.acreate(
             model='qwen-plus',
             messages=messages,
