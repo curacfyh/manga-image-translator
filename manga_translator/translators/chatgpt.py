@@ -352,7 +352,7 @@ class HaikuTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        # print(response.choices[0].message.content)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
     
 # https://api.perplexity.ai的mixtral-8x7b-instruct，兼容openai格式
@@ -387,7 +387,7 @@ class Mix8x7bTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        # print(response.choices[0].message.content)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
     
 # https://api.perplexity.ai的sonar-medium-online，兼容openai格式
@@ -422,7 +422,7 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        # print(response.choices[0].message.content)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
     
 # https://api.perplexity.ai的sonar-medium-chat，兼容openai格式
@@ -457,7 +457,7 @@ class SonarMediumChatTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        # print(response.choices[0].message.content)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
 
 # https://kimi.geekcoder.shop，兼容openai格式
@@ -492,7 +492,7 @@ class KimiTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        # print(response.choices[0].message.content)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
 
 # https://qwen.geekcoder.shop，兼容openai格式
@@ -527,7 +527,7 @@ class QwenTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        # print(response.choices[0].message.content)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
     
 # https://chat.flss.world/api/openai/v1，兼容openai格式
@@ -597,5 +597,40 @@ class GlmTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
-        # print(response.choices[0].message.content)
+        print(response.choices[0].message.content)
+        return response.choices[0].message.content
+
+# https://chat.flss.world/api/openai/v1，兼容openai格式
+class Glm4Translator(GPT35TurboTranslator):
+    _CONFIG_KEY = 'glm-4'
+    _MAX_REQUESTS_PER_MINUTE = 200
+    _RETRY_ATTEMPTS = 5
+    _MAX_TOKENS = 8192
+
+    async def _request_translation(self, to_lang: str, prompt: str) -> str:
+        messages = [
+            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
+            {'role': 'user', 'content': prompt},
+        ]
+
+        if to_lang in self._CHAT_SAMPLE:
+            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
+            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
+
+        response = await openai.ChatCompletion.acreate(
+            model='glm-4',
+            messages=messages,
+            max_tokens=self._MAX_TOKENS // 2,
+            temperature=self.temperature,
+            top_p=self.top_p,
+        )
+
+        self.token_count += response.usage['total_tokens']
+        self.token_count_last = response.usage['total_tokens']
+        for choice in response.choices:
+            if 'text' in choice:
+                return choice.text
+
+        # If no response with text is found, return the first response's content (which may be empty)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content

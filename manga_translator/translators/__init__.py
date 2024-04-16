@@ -9,7 +9,7 @@ from .papago import PapagoTranslator
 from .caiyun import CaiyunTranslator
 from .chatgpt import (GPT3Translator, GPT35TurboTranslator, GPT4Translator, HaikuTranslator, 
                       Mix8x7bTranslator, SonarMediumOnlineTranslator, SonarMediumChatTranslator, 
-                      KimiTranslator, QwenTranslator, GlmTranslator, QwenPlusTranslator)
+                      KimiTranslator, QwenTranslator, QwenPlusTranslator, GlmTranslator, Glm4Translator)
 from .nllb import NLLBTranslator, NLLBBigTranslator
 from .sugoi import JparacrawlTranslator, JparacrawlBigTranslator, SugoiTranslator
 from .m2m100 import M2M100Translator, M2M100BigTranslator
@@ -48,7 +48,8 @@ TRANSLATORS = {
     'kimi': KimiTranslator,
     'qwen': QwenTranslator,
     'qwen-plus': QwenPlusTranslator,
-    'glm': GlmTranslator,
+    'glm4': GlmTranslator,
+    'glm-4': Glm4Translator,
     'none': NoneTranslator,
     'original': OriginalTranslator,
     'sakura': Sakura13BTranslator,
