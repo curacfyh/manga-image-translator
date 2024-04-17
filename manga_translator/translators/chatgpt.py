@@ -328,7 +328,7 @@ class GPT4TurboTranslator(GPT35TurboTranslator):
     _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 6
     _MAX_TOKENS = 8192
-    _TIMEOUT = 180
+    _TIMEOUT = 240
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
         messages = [
