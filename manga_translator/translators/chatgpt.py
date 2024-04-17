@@ -320,6 +320,7 @@ class GPT4Translator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
 
 class GPT4TurboTranslator(GPT35TurboTranslator):
@@ -354,6 +355,7 @@ class GPT4TurboTranslator(GPT35TurboTranslator):
                 return choice.text
 
         # If no response with text is found, return the first response's content (which may be empty)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
 
 class HaikuTranslator(GPT35TurboTranslator):
