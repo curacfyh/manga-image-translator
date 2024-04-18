@@ -43,7 +43,7 @@ class GPT3Translator(CommonTranslator):
     }
     _INVALID_REPEAT_COUNT = 3 # repeat up to 2 times if "invalid" translation was detected
     _MAX_REQUESTS_PER_MINUTE = 20
-    _TIMEOUT = 240 # Seconds to wait for a response from the server before retrying
+    _TIMEOUT = 420 # Seconds to wait for a response from the server before retrying
     _RETRY_ATTEMPTS = 5 # Number of times to retry an errored request before giving up
     _TIMEOUT_RETRY_ATTEMPTS = 3 # Number of times to retry a timed out request before giving up
     _RATELIMIT_RETRY_ATTEMPTS = 3 # Number of times to retry a ratelimited request before giving up
@@ -293,7 +293,7 @@ class GPT4Translator(GPT35TurboTranslator):
     _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
-    _TIMEOUT = 240
+    _TIMEOUT = 420
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
         messages = [
@@ -328,7 +328,7 @@ class GPT4TurboTranslator(GPT35TurboTranslator):
     _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 6
     _MAX_TOKENS = 8192
-    _TIMEOUT = 240
+    _TIMEOUT = 420
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
         messages = [

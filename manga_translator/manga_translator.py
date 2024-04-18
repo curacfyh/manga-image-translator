@@ -724,7 +724,6 @@ class MangaTranslatorWeb(MangaTranslator):
             if self.verbose:
                 # Write log file
                 log_file = self._result_path('log.txt')
-                print(f'★★★★★Logging to {log_file}')
                 add_file_logger(log_file)
 
             # final.jpg will be renamed if format param is set
