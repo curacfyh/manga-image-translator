@@ -44,7 +44,7 @@ class GPT3Translator(CommonTranslator):
     _INVALID_REPEAT_COUNT = 3 # repeat up to 2 times if "invalid" translation was detected
     _MAX_REQUESTS_PER_MINUTE = 20
     _TIMEOUT = 420 # Seconds to wait for a response from the server before retrying
-    _RETRY_ATTEMPTS = 5 # Number of times to retry an errored request before giving up
+    _RETRY_ATTEMPTS = 3 # Number of times to retry an errored request before giving up
     _TIMEOUT_RETRY_ATTEMPTS = 3 # Number of times to retry a timed out request before giving up
     _RATELIMIT_RETRY_ATTEMPTS = 3 # Number of times to retry a ratelimited request before giving up
     _CONFIG_KEY = 'gpt3'
@@ -291,7 +291,7 @@ class GPT35TurboTranslator(GPT3Translator):
 class GPT4Translator(GPT35TurboTranslator):
     _CONFIG_KEY = 'gpt-4'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
     _TIMEOUT = 420
 
@@ -326,7 +326,7 @@ class GPT4Translator(GPT35TurboTranslator):
 class GPT4TurboTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'gpt-4-turbo-preview'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 6
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
     _TIMEOUT = 420
 
@@ -361,7 +361,7 @@ class GPT4TurboTranslator(GPT35TurboTranslator):
 class HaikuTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'claude-3-haiku-20240307'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
@@ -396,7 +396,7 @@ class HaikuTranslator(GPT35TurboTranslator):
 class Mix8x7bTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'mixtral-8x7b-instruct'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
@@ -431,7 +431,7 @@ class Mix8x7bTranslator(GPT35TurboTranslator):
 class SonarMediumOnlineTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'sonar-medium-online'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
@@ -466,7 +466,7 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
 class SonarMediumChatTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'sonar-medium-chat'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
@@ -501,7 +501,7 @@ class SonarMediumChatTranslator(GPT35TurboTranslator):
 class KimiTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'kimi'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
@@ -536,7 +536,7 @@ class KimiTranslator(GPT35TurboTranslator):
 class QwenTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'qwen'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
@@ -571,7 +571,7 @@ class QwenTranslator(GPT35TurboTranslator):
 class QwenPlusTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'qwen-plus'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
@@ -606,7 +606,7 @@ class QwenPlusTranslator(GPT35TurboTranslator):
 class GlmTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'glm4'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
@@ -641,7 +641,7 @@ class GlmTranslator(GPT35TurboTranslator):
 class Glm4Translator(GPT35TurboTranslator):
     _CONFIG_KEY = 'glm-4'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 5
+    _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
