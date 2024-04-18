@@ -43,6 +43,7 @@ def get_logger(name: str):
 file_handlers = {}
 
 def add_file_logger(path: str):
+    print(f'★★★★★ Adding file logger for {path}')
     if path in file_handlers:
         return
     file_handlers[path] = logging.FileHandler(path, encoding='utf8')
