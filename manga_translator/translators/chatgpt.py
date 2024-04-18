@@ -41,10 +41,10 @@ class GPT3Translator(CommonTranslator):
         'THA': 'Thai',
         'IND': 'Indonesian'
     }
-    _INVALID_REPEAT_COUNT = 2 # repeat up to 2 times if "invalid" translation was detected
+    _INVALID_REPEAT_COUNT = 3 # repeat up to 2 times if "invalid" translation was detected
     _MAX_REQUESTS_PER_MINUTE = 20
-    _TIMEOUT = 40 # Seconds to wait for a response from the server before retrying
-    _RETRY_ATTEMPTS = 3 # Number of times to retry an errored request before giving up
+    _TIMEOUT = 240 # Seconds to wait for a response from the server before retrying
+    _RETRY_ATTEMPTS = 5 # Number of times to retry an errored request before giving up
     _TIMEOUT_RETRY_ATTEMPTS = 3 # Number of times to retry a timed out request before giving up
     _RATELIMIT_RETRY_ATTEMPTS = 3 # Number of times to retry a ratelimited request before giving up
     _CONFIG_KEY = 'gpt3'
@@ -202,7 +202,7 @@ class GPT3Translator(CommonTranslator):
 
 class GPT35TurboTranslator(GPT3Translator):
     _CONFIG_KEY = 'gpt35'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETURN_PROMPT = False
     _INCLUDE_TEMPLATE = False
 
@@ -293,7 +293,7 @@ class GPT4Translator(GPT35TurboTranslator):
     _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
-    _TIMEOUT = 120
+    _TIMEOUT = 240
 
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
         messages = [
@@ -360,7 +360,7 @@ class GPT4TurboTranslator(GPT35TurboTranslator):
 
 class HaikuTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'claude-3-haiku-20240307'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
 
@@ -395,7 +395,7 @@ class HaikuTranslator(GPT35TurboTranslator):
 # https://api.perplexity.ai的mixtral-8x7b-instruct，兼容openai格式
 class Mix8x7bTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'mixtral-8x7b-instruct'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
 
@@ -430,7 +430,7 @@ class Mix8x7bTranslator(GPT35TurboTranslator):
 # https://api.perplexity.ai的sonar-medium-online，兼容openai格式
 class SonarMediumOnlineTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'sonar-medium-online'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
 
@@ -465,7 +465,7 @@ class SonarMediumOnlineTranslator(GPT35TurboTranslator):
 # https://api.perplexity.ai的sonar-medium-chat，兼容openai格式
 class SonarMediumChatTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'sonar-medium-chat'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
 
@@ -500,7 +500,7 @@ class SonarMediumChatTranslator(GPT35TurboTranslator):
 # https://kimi.geekcoder.shop，兼容openai格式
 class KimiTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'kimi'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
 
@@ -535,7 +535,7 @@ class KimiTranslator(GPT35TurboTranslator):
 # https://qwen.geekcoder.shop，兼容openai格式
 class QwenTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'qwen'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
 
@@ -570,7 +570,7 @@ class QwenTranslator(GPT35TurboTranslator):
 # https://chat.flss.world/api/openai/v1，兼容openai格式
 class QwenPlusTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'qwen-plus'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
 
@@ -605,7 +605,7 @@ class QwenPlusTranslator(GPT35TurboTranslator):
 # https://glm.geekcoder.shop，兼容openai格式
 class GlmTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'glm4'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
 
@@ -640,7 +640,7 @@ class GlmTranslator(GPT35TurboTranslator):
 # https://chat.flss.world/api/openai/v1，兼容openai格式
 class Glm4Translator(GPT35TurboTranslator):
     _CONFIG_KEY = 'glm-4'
-    _MAX_REQUESTS_PER_MINUTE = 200
+    _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 5
     _MAX_TOKENS = 8192
 
