@@ -324,6 +324,41 @@ class GPT4Translator(GPT35TurboTranslator):
         return response.choices[0].message.content
 
 class GPT4TurboTranslator(GPT35TurboTranslator):
+    _CONFIG_KEY = 'gpt-4-turbo'
+    _MAX_REQUESTS_PER_MINUTE = 20
+    _RETRY_ATTEMPTS = 3
+    _MAX_TOKENS = 8192
+    _TIMEOUT = 420
+
+    async def _request_translation(self, to_lang: str, prompt: str) -> str:
+        messages = [
+            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
+            {'role': 'user', 'content': prompt},
+        ]
+
+        if to_lang in self._CHAT_SAMPLE:
+            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
+            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
+
+        response = await openai.ChatCompletion.acreate(
+            model='gpt-4-turbo',
+            messages=messages,
+            max_tokens=self._MAX_TOKENS // 2,
+            temperature=self.temperature,
+            top_p=self.top_p,
+        )
+
+        self.token_count += response.usage['total_tokens']
+        self.token_count_last = response.usage['total_tokens']
+        for choice in response.choices:
+            if 'text' in choice:
+                return choice.text
+
+        # If no response with text is found, return the first response's content (which may be empty)
+        print(response.choices[0].message.content)
+        return response.choices[0].message.content
+    
+class GPT4TurboPreviewTranslator(GPT35TurboTranslator):
     _CONFIG_KEY = 'gpt-4-turbo-preview'
     _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 3
