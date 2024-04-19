@@ -533,7 +533,7 @@ class SonarMediumChatTranslator(GPT35TurboTranslator):
         return response.choices[0].message.content
 
 class Llama370bTranslator(GPT35TurboTranslator):
-    _CONFIG_KEY = 'sonar-medium-chat'
+    _CONFIG_KEY = 'llama-3-70b-instruct'
     _MAX_REQUESTS_PER_MINUTE = 20
     _RETRY_ATTEMPTS = 3
     _MAX_TOKENS = 8192
@@ -549,7 +549,7 @@ class Llama370bTranslator(GPT35TurboTranslator):
             messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
 
         response = await openai.ChatCompletion.acreate(
-            model='sonar-medium-chat',
+            model='llama-3-70b-instruct',
             messages=messages,
             max_tokens=self._MAX_TOKENS // 2,
             temperature=self.temperature,
