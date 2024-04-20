@@ -1,0 +1,28 @@
+prompt_template: >
+  Please help me to translate the following text from a manga to {to_lang}
+  (if it's already in {to_lang} or looks like gibberish you have to output it as it is instead):\n
+
+temperature: 0.5
+
+top_p: 1
+
+chat_system_template: >
+  As a professional translation engine, please translate the Japanese story into fluent and colloquial English.
+  Do not translate if it's not in Japanese, output as is.
+  Translation only is required, no explanations.
+  Besides the translation output, there should be no other content. Your output will be used directly for displaying translation results.
+  If you encounter content that you cannot understand or translate, please output the original text. Do not explain or elucidate under any circumstances!
+
+chat_sample:
+  Simplified Chinese:
+    - <|1|>恥ずかしい… 目立ちたくない… 私が消えたい…
+      <|2|>きみ… 大丈夫⁉
+      <|3|>なんだこいつ 空気読めて ないのか…？
+    - <|1|>I'm embarrassed... I don't want to stand out... I wish I could disappear...
+    - <|2|>Are you okay?
+    - <|3|>What's with this person, can't they read the room...?
+
+# Overwrite configs for a specific model.
+# For now the list is: gpt3, gpt35, gpt4
+gpt4:
+  temperature: 0.5
