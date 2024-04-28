@@ -8,7 +8,7 @@ from .deepl import DeeplTranslator
 from .papago import PapagoTranslator
 from .caiyun import CaiyunTranslator
 from .chatgpt import (GPT3Translator, GPT35TurboTranslator, GPT4Translator, HaikuTranslator, 
-                      Mix8x7bTranslator, SonarMediumOnlineTranslator, SonarMediumChatTranslator, Llama370bTranslator,
+                      Mix8x7bTranslator, SonarMediumOnlineTranslator, SonarMediumChatTranslator, Llama370bTranslator, Llama370b8192Translator,
                       KimiTranslator, QwenTranslator, QwenPlusTranslator, GlmTranslator, Glm4Translator,
                       GPT4TurboTranslator, GPT4TurboPreviewTranslator)
 from .nllb import NLLBTranslator, NLLBBigTranslator
@@ -49,6 +49,7 @@ TRANSLATORS = {
     'sonar_medium_online': SonarMediumOnlineTranslator,
     'sonar_medium_chat': SonarMediumChatTranslator,
     'llama3_70b': Llama370bTranslator,
+    'llama3_70b_8192': Llama370b8192Translator,
     'kimi': KimiTranslator,
     'qwen': QwenTranslator,
     'qwen-plus': QwenPlusTranslator,
