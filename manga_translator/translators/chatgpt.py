@@ -200,13 +200,44 @@ class GPT3Translator(CommonTranslator):
         self.token_count_last = response.usage['total_tokens']
         return response.choices[0].text
 
-class GPT35TurboTranslator(GPT3Translator):
+class BaseGPTTranslator(GPT3Translator):
+    _MAX_REQUESTS_PER_MINUTE = 20
+    _RETRY_ATTEMPTS = 3
+    _MAX_TOKENS = 8192
+    _TIMEOUT = 420
+    _RETURN_PROMPT = False
+
+    async def _request_translation(self, to_lang: str, prompt: str) -> str:
+        messages = [
+            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
+            {'role': 'user', 'content': prompt},
+        ]
+
+        if hasattr(self, '_CHAT_SAMPLE') and to_lang in self._CHAT_SAMPLE:
+            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
+            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
+
+        response = await openai.ChatCompletion.acreate(
+            model=self._CONFIG_KEY,
+            messages=messages,
+            max_tokens=self._MAX_TOKENS // 2,
+            temperature=self.temperature,
+            top_p=self.top_p,
+        )
+
+        self.token_count += response.usage['total_tokens']
+        self.token_count_last = response.usage['total_tokens']
+        for choice in response.choices:
+            if 'text' in choice:
+                return choice.text
+
+        # If no response with text is found, return the first response's content (which may be empty)
+        return response.choices[0].message.content
+
+class GPT35TurboTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'gpt35'
     _MAX_REQUESTS_PER_MINUTE = 20
-    _RETURN_PROMPT = False
     _INCLUDE_TEMPLATE = False
-
-    # Token: 57+
     _CHAT_SYSTEM_TEMPLATE = (
         'You are a professional translation engine, '
         'please translate the story into a colloquial, '
@@ -219,558 +250,64 @@ class GPT35TurboTranslator(GPT3Translator):
         'Translate to {to_lang}.'
     )
     _CHAT_SAMPLE = {
-        'Simplified Chinese': [ # Token: 88 + 84
+        'Simplified Chinese': [
             (
-                '<|1|>恥ずかしい… 目立ちたくない… 私が消えたい…\n'
-                '<|2|>きみ… 大丈夫⁉\n'
-                '<|3|>なんだこいつ 空気読めて ないのか…？'
+                '恥ずかしい… 目立ちたくない… 私が消えたい…\n'
+                'きみ… 大丈夫⁉\n'
+                'なんだこいつ 空気読めて ないのか…？'
             ),
             (
-                '<|1|>好尴尬…我不想引人注目…我想消失…\n'
-                '<|2|>你…没事吧⁉\n'
-                '<|3|>这家伙怎么看不懂气氛的…？'
+                '好尴尬…我不想引人注目…我想消失…\n'
+                '你…没事吧⁉\n'
+                '这家伙怎么看不懂气氛的…？'
             ),
         ]
     }
-
-    @property
-    def chat_system_template(self) -> str:
-        return self._config_get('chat_system_template', self._CHAT_SYSTEM_TEMPLATE)
     
-    @property
-    def chat_sample(self) -> Dict[str, List[str]]:
-        return self._config_get('chat_sample', self._CHAT_SAMPLE)
-
-    def _format_prompt_log(self, to_lang: str, prompt: str) -> str:
-        if to_lang in self.chat_sample:
-            return '\n'.join([
-                'System:',
-                self.chat_system_template.format(to_lang=to_lang),
-                'User:',
-                self.chat_sample[to_lang][0],
-                'Assistant:',
-                self.chat_sample[to_lang][1],
-                'User:',
-                prompt,
-            ])
-        else:
-            return '\n'.join([
-                'System:',
-                self.chat_system_template.format(to_lang=to_lang),
-                'User:',
-                prompt,
-            ])
-
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self.chat_sample:
-            messages.insert(1, {'role': 'user', 'content': self.chat_sample[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self.chat_sample[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='gpt-3.5-turbo',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        return response.choices[0].message.content
-
-class GPT4Translator(GPT35TurboTranslator):
+class GPT4Translator(BaseGPTTranslator):
     _CONFIG_KEY = 'gpt-4'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
-    _TIMEOUT = 420
 
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='gpt-4',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
-
-class GPT4TurboTranslator(GPT35TurboTranslator):
+class GPT4TurboTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'gpt-4-turbo'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
-    _TIMEOUT = 420
-
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='gpt-4-turbo',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
     
-class GPT4TurboPreviewTranslator(GPT35TurboTranslator):
+class GPT4TurboPreviewTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'gpt-4-turbo-preview'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
-    _TIMEOUT = 420
 
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='gpt-4-turbo-preview',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
-
-class HaikuTranslator(GPT35TurboTranslator):
+class HaikuTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'claude-3-haiku-20240307'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
 
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='claude-3-haiku-20240307',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
+class SonnetTranslator(BaseGPTTranslator):
+    _CONFIG_KEY = 'claude-3-sonnet-20240229'
+ 
+class OpusTranslator(BaseGPTTranslator):
+    _CONFIG_KEY = 'claude-3-opus-20240229'
     
-# https://api.perplexity.ai的mixtral-8x7b-instruct，兼容openai格式
-class Mix8x7bTranslator(GPT35TurboTranslator):
+class Mix8x7bTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'mixtral-8x7b-instruct'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
-
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='mixtral-8x7b-instruct',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
     
-# https://api.perplexity.ai的sonar-medium-online，兼容openai格式
-class SonarMediumOnlineTranslator(GPT35TurboTranslator):
+class SonarMediumOnlineTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'sonar-medium-online'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
-
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='sonar-medium-online',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
     
-# https://api.perplexity.ai的sonar-medium-chat，兼容openai格式
-class SonarMediumChatTranslator(GPT35TurboTranslator):
+class SonarMediumChatTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'sonar-medium-chat'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
 
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='sonar-medium-chat',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
-
-class Llama370bTranslator(GPT35TurboTranslator):
+class Llama370bTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'llama-3-70b-instruct'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
-
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='llama-3-70b-instruct',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
     
-class Llama370b8192Translator(GPT35TurboTranslator):
+class Llama370b8192Translator(BaseGPTTranslator):
     _CONFIG_KEY = 'llama3-70b-8192'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
-
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='llama3-70b-8192',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
     
-# https://kimi.geekcoder.shop，兼容openai格式
-class KimiTranslator(GPT35TurboTranslator):
+class KimiTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'kimi'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
 
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='kimi',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
-
-# https://qwen.geekcoder.shop，兼容openai格式
-class QwenTranslator(GPT35TurboTranslator):
+class QwenTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'qwen'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
-
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='qwen',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
     
-# https://chat.flss.world/api/openai/v1，兼容openai格式
-class QwenPlusTranslator(GPT35TurboTranslator):
+class QwenPlusTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'qwen-plus'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
 
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='qwen-plus',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
-
-# https://glm.geekcoder.shop，兼容openai格式
-class GlmTranslator(GPT35TurboTranslator):
+class GlmTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'glm4'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
 
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='glm4',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content
-
-# https://chat.flss.world/api/openai/v1，兼容openai格式
-class Glm4Translator(GPT35TurboTranslator):
+class Glm4Translator(BaseGPTTranslator):
     _CONFIG_KEY = 'glm-4'
-    _MAX_REQUESTS_PER_MINUTE = 20
-    _RETRY_ATTEMPTS = 3
-    _MAX_TOKENS = 8192
-
-    async def _request_translation(self, to_lang: str, prompt: str) -> str:
-        messages = [
-            {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
-            {'role': 'user', 'content': prompt},
-        ]
-
-        if to_lang in self._CHAT_SAMPLE:
-            messages.insert(1, {'role': 'user', 'content': self._CHAT_SAMPLE[to_lang][0]})
-            messages.insert(2, {'role': 'assistant', 'content': self._CHAT_SAMPLE[to_lang][1]})
-
-        response = await openai.ChatCompletion.acreate(
-            model='glm-4',
-            messages=messages,
-            max_tokens=self._MAX_TOKENS // 2,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-
-        self.token_count += response.usage['total_tokens']
-        self.token_count_last = response.usage['total_tokens']
-        for choice in response.choices:
-            if 'text' in choice:
-                return choice.text
-
-        # If no response with text is found, return the first response's content (which may be empty)
-        print(response.choices[0].message.content)
-        return response.choices[0].message.content

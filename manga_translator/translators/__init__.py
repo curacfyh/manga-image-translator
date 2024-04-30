@@ -7,10 +7,11 @@ from .youdao import YoudaoTranslator
 from .deepl import DeeplTranslator
 from .papago import PapagoTranslator
 from .caiyun import CaiyunTranslator
-from .chatgpt import (GPT3Translator, GPT35TurboTranslator, GPT4Translator, HaikuTranslator, 
+from .chatgpt import (GPT3Translator, GPT35TurboTranslator, GPT4Translator, HaikuTranslator, SonnetTranslator, OpusTranslator,
                       Mix8x7bTranslator, SonarMediumOnlineTranslator, SonarMediumChatTranslator, Llama370bTranslator, Llama370b8192Translator,
                       KimiTranslator, QwenTranslator, QwenPlusTranslator, GlmTranslator, Glm4Translator,
                       GPT4TurboTranslator, GPT4TurboPreviewTranslator)
+from .qwen import QwenOfficialTurboTranslator, QwenOfficialPlusTranslator
 from .nllb import NLLBTranslator, NLLBBigTranslator
 from .sugoi import JparacrawlTranslator, JparacrawlBigTranslator, SugoiTranslator
 from .m2m100 import M2M100Translator, M2M100BigTranslator
@@ -45,6 +46,8 @@ TRANSLATORS = {
     'gpt4turbo': GPT4TurboTranslator,
     'gpt4turbopreview': GPT4TurboPreviewTranslator,
     'haiku': HaikuTranslator,
+    'sonnet': SonnetTranslator,
+    'opus': OpusTranslator,
     'mix8x7b': Mix8x7bTranslator,
     'sonar_medium_online': SonarMediumOnlineTranslator,
     'sonar_medium_chat': SonarMediumChatTranslator,
@@ -53,6 +56,8 @@ TRANSLATORS = {
     'kimi': KimiTranslator,
     'qwen': QwenTranslator,
     'qwen-plus': QwenPlusTranslator,
+    'qwen-official-turbo': QwenOfficialTurboTranslator,
+    'qwen-official-plus': QwenOfficialPlusTranslator,
     'glm4': GlmTranslator,
     'glm-4': Glm4Translator,
     'none': NoneTranslator,
