@@ -206,7 +206,60 @@ class BaseGPTTranslator(GPT3Translator):
     _MAX_TOKENS = 8192
     _TIMEOUT = 420
     _RETURN_PROMPT = False
+    _CHAT_SYSTEM_TEMPLATE = (
+        'You are a professional translation engine, '
+        'please translate the story into a colloquial, '
+        'elegant and fluent content, '
+        'without referencing machine translations. '
+        'You must only translate the story, '
+        'never interpret it. '
+        'If there is any issue in the text, '
+        'output it as is.\n'
+        'Translate to {to_lang}.'
+    )
+    _CHAT_SAMPLE = {
+        'Simplified Chinese': [
+            (
+                '恥ずかしい… 目立ちたくない… 私が消えたい…\n'
+                'きみ… 大丈夫⁉\n'
+                'なんだこいつ 空気読めて ないのか…？'
+            ),
+            (
+                '好尴尬…我不想引人注目…我想消失…\n'
+                '你…没事吧⁉\n'
+                '这家伙怎么看不懂气氛的…？'
+            ),
+        ]
+    }
 
+    @property
+    def chat_system_template(self) -> str:
+        return self._config_get('chat_system_template', self._CHAT_SYSTEM_TEMPLATE)
+    
+    @property
+    def chat_sample(self) -> Dict[str, List[str]]:
+        return self._config_get('chat_sample', self._CHAT_SAMPLE)
+
+    def _format_prompt_log(self, to_lang: str, prompt: str) -> str:
+        if to_lang in self.chat_sample:
+            return '\n'.join([
+                'System:',
+                self.chat_system_template.format(to_lang=to_lang),
+                'User:',
+                self.chat_sample[to_lang][0],
+                'Assistant:',
+                self.chat_sample[to_lang][1],
+                'User:',
+                prompt,
+            ])
+        else:
+            return '\n'.join([
+                'System:',
+                self.chat_system_template.format(to_lang=to_lang),
+                'User:',
+                prompt,
+            ])
+            
     async def _request_translation(self, to_lang: str, prompt: str) -> str:
         messages = [
             {'role': 'system', 'content': self.chat_system_template.format(to_lang=to_lang)},
@@ -238,31 +291,6 @@ class GPT35TurboTranslator(BaseGPTTranslator):
     _CONFIG_KEY = 'gpt35'
     _MAX_REQUESTS_PER_MINUTE = 20
     _INCLUDE_TEMPLATE = False
-    _CHAT_SYSTEM_TEMPLATE = (
-        'You are a professional translation engine, '
-        'please translate the story into a colloquial, '
-        'elegant and fluent content, '
-        'without referencing machine translations. '
-        'You must only translate the story, '
-        'never interpret it. '
-        'If there is any issue in the text, '
-        'output it as is.\n'
-        'Translate to {to_lang}.'
-    )
-    _CHAT_SAMPLE = {
-        'Simplified Chinese': [
-            (
-                '恥ずかしい… 目立ちたくない… 私が消えたい…\n'
-                'きみ… 大丈夫⁉\n'
-                'なんだこいつ 空気読めて ないのか…？'
-            ),
-            (
-                '好尴尬…我不想引人注目…我想消失…\n'
-                '你…没事吧⁉\n'
-                '这家伙怎么看不懂气氛的…？'
-            ),
-        ]
-    }
     
 class GPT4Translator(BaseGPTTranslator):
     _CONFIG_KEY = 'gpt-4'

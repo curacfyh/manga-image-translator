@@ -39,3 +39,5 @@ share/python-wheels/
 *.egg
 MANIFEST
 .history
+
+chatgpt copy.py
