@@ -134,11 +134,10 @@ class QwenBaseTranslator(CommonTranslator):
                 )
                 self.logger.debug(f'★千问返回: {response}')
                 if response.status_code == HTTPStatus.OK:
-                    # 提取内容并返回
                     return response.output['choices'][0]['message']['content']
                 else:
-                    # 如果响应码不是200，我们将尝试重试
-                    self.logger.warn(f'Request failed with status {response.status_code}, retrying... Attempt: {retry_attempt + 1}')
+                    return ''
+                    # self.logger.warn(f'Request failed with status {response.status_code}, retrying... Attempt: {retry_attempt + 1}')
             except asyncio.TimeoutError as e:
                 self.logger.warn(f'Request timeout, retrying... Attempt: {retry_attempt + 1}')
             except Exception as e:
